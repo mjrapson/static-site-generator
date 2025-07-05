@@ -20,7 +20,10 @@ def heading_block_to_html_node(block):
             break
 
     value = block[count + 1:]
-    return LeafNode(f"h{count}", value)
+    content_html_nodes = []
+    for node in text_to_textnodes(value):
+        content_html_nodes.append(text_node_to_html_node(node))
+    return ParentNode(f"h{count}", content_html_nodes)
 
 def code_block_to_html_node(block):
     value = block.replace("```\n", "").replace("```", "")
