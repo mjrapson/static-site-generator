@@ -24,6 +24,15 @@ def generate_page(source, template_path, destination):
     with open(destination, "w") as file:
         file.write(template)
 
+def generate_pages_recursive(source_path, template_path, destination_path):
+    for item in os.listdir(source_path):
+        item_path = os.path.join(source_path, item)
+        dest_path = os.path.join(destination_path, item)
+        if os.path.isfile(item_path) and item_path.endswith(".md"):
+            generate_page(item_path, template_path, dest_path.replace(".md", ".html"))
+        elif os.path.isdir(item_path):
+            os.mkdir(dest_path)
+            generate_pages_recursive(item_path, template_path, dest_path)
 
 def copy_folder(source, destination):
     if not os.path.exists(destination):
@@ -49,14 +58,11 @@ def main():
     if os.path.exists(public_folder):
         shutil.rmtree(public_folder)
 
-    
     copy_folder(static_folder, public_folder)
 
-    content = os.path.join(os.path.abspath("content"), "index.md")
+    content_folder = os.path.abspath("content")
     template = os.path.abspath("template.html")
-    destination_page = os.path.join(public_folder, "index.html")
-    
-    generate_page(content, template, destination_page)
+    generate_pages_recursive(content_folder, template, public_folder)
 
 if __name__ == "__main__":
     main()
