@@ -2,8 +2,9 @@ from convert_markdown import markdown_to_html_node, extract_tile
 
 import os
 import shutil
+import sys
 
-def generate_page(source, template_path, destination):
+def generate_page(base_path, source, template_path, destination):
     print(f"Generating page from {source} to {destination} using {template_path}")
 
     markdown = ""
@@ -20,19 +21,21 @@ def generate_page(source, template_path, destination):
     
     template = template.replace("{{ Title }}", page_title)
     template = template.replace("{{ Content }}", html_content)
+    template = template.replace('href="/', f'href="{base_path}')
+    template = template.replace('src="/', f'src="{base_path}')
 
     with open(destination, "w") as file:
         file.write(template)
 
-def generate_pages_recursive(source_path, template_path, destination_path):
+def generate_pages_recursive(base_path, source_path, template_path, destination_path):
     for item in os.listdir(source_path):
         item_path = os.path.join(source_path, item)
         dest_path = os.path.join(destination_path, item)
         if os.path.isfile(item_path) and item_path.endswith(".md"):
-            generate_page(item_path, template_path, dest_path.replace(".md", ".html"))
+            generate_page(base_path, item_path, template_path, dest_path.replace(".md", ".html"))
         elif os.path.isdir(item_path):
             os.mkdir(dest_path)
-            generate_pages_recursive(item_path, template_path, dest_path)
+            generate_pages_recursive(base_path, item_path, template_path, dest_path)
 
 def copy_folder(source, destination):
     if not os.path.exists(destination):
@@ -52,17 +55,21 @@ def copy_folder(source, destination):
 
 
 def main():
-    public_folder = os.path.abspath("public")
+    base_path = "/"
+    if len(sys.argv) > 1:
+        base_path = sys.argv[1]
+    
+    docs_folder = os.path.abspath("docs")
     static_folder = os.path.abspath("static")
 
-    if os.path.exists(public_folder):
-        shutil.rmtree(public_folder)
+    if os.path.exists(docs_folder):
+        shutil.rmtree(docs_folder)
 
-    copy_folder(static_folder, public_folder)
+    copy_folder(static_folder, docs_folder)
 
     content_folder = os.path.abspath("content")
     template = os.path.abspath("template.html")
-    generate_pages_recursive(content_folder, template, public_folder)
+    generate_pages_recursive(base_path, content_folder, template, docs_folder)
 
 if __name__ == "__main__":
     main()
