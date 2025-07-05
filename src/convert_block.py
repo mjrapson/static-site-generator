@@ -3,9 +3,9 @@ from blocktype import BlockType
 import re
 
 def markdown_to_blocks(markdown):
-    split_markdown = markdown.split('\n\n')
+    split_markdown = markdown.split("\n\n")
     block_strings = list(map(lambda x: x.strip(), split_markdown))
-    block_strings = list(filter(lambda x: x != "\n", block_strings))
+    block_strings = list(filter(lambda x: x != "", block_strings))
     return block_strings
 
 def block_to_block_type(block):

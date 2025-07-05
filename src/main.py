@@ -8,7 +8,7 @@ def generate_page(source, template_path, destination):
 
     markdown = ""
     with open(source, "r") as file:
-        markdown = "\n".join(file.readlines())
+        markdown = "".join(file.readlines())
 
     template = ""
     with open(template_path, "r") as file:
